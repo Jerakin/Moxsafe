@@ -88,17 +88,17 @@ class Moxsafe:
     def index(self):
         return self._index["index"]
 
-    def add_version(self, deck: moxfield.Deck, comment=""):
+    def add_version(self, deck: moxfield.Deck, comment):
         deck_file = repository_path / f"{deck.id}.txt"
         old_list = deck.list
         deck.load_from_id(deck.id)
         if old_list == deck.list:
             return
-        _git('checkout', '-b', deck.id)
+        _git('checkout', deck.id)
         with deck_file.open("w") as fp:
             fp.write(deck.list)
         _git('add', deck_file)
-        _git('commit', "-m", comment)
+        _git('commit', "-m", comment if comment else "Update")
         _git('checkout', "main")
 
 

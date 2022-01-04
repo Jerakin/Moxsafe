@@ -43,14 +43,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.card_image.setScaledContents(True)
         self.card_image.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
-    def save_snapshot(self):
+    def _save_snapshot(self, comment):
         deck_name = self.deckSwitch.currentText()
         deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
-        self.moxsafe.add_version(deck)
+        self.moxsafe.add_version(deck, comment)
         self.list_template_model.removeRows(0, self.list_template_model.rowCount())
         for card in deck.mainboard:
             item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
             self.list_template_model.appendRow(item)
+
+    def save_snapshot(self):
+        dialog = save_dialog.SaveDialog()
+        dialog.add_deck_signal.connect(lambda: self._save_snapshot(dialog.lineEdit.text()))
+        dialog.exec_()
 
     def update_list(self):
         deck_name = self.deckSwitch.currentText()

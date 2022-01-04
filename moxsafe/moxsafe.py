@@ -43,6 +43,15 @@ class Moxsafe:
         with self._index_file.open("r") as fp:
             self._index = json.load(fp)
 
+    def versions(self, deck):
+        names = []
+        output = subprocess.check_output('git branch -l', shell=True)
+        for line in output.decode("utf-8").split("\n"):
+            line = line.replace("*", "").strip()
+            if deck.id in line:
+                names.append(line.replace(f"{deck.id}/", ""))
+        return names
+
     @staticmethod
     def deck_already_exists(deck_id):
         try:
@@ -53,8 +62,8 @@ class Moxsafe:
             return True
 
     @staticmethod
-    def get_deck(deck_id):
-        _git('checkout', deck_id)
+    def get_deck(deck_id, version_name="main"):
+        _git('checkout', f"{deck_id}/{version_name}")
         deck = moxfield.Deck(deck_file=repository_path / f"{deck_id}.txt")
         _git('checkout', 'main')
         return deck
@@ -65,7 +74,7 @@ class Moxsafe:
             raise FileExistsError(f"Deck '{deck.name}' with id '{deck.id}' already exists")
 
         _git('checkout', self._root_sha)
-        _git('checkout', '-b', deck.id)
+        _git('checkout', '-b', f"{deck.id}/main")
 
         with deck_file.open("w") as fp:
             fp.write(deck.list)
@@ -88,13 +97,17 @@ class Moxsafe:
     def index(self):
         return self._index["index"]
 
-    def add_version(self, deck: moxfield.Deck, comment):
+    def add_version(self, deck: moxfield.Deck, based_on, version_name="main"):
+        _git('checkout', f"{deck.id}/{based_on}")
+        _git('checkout', "-b", f"{deck.id}/{version_name}")
+
+    def add_snapshot(self, deck: moxfield.Deck, comment, active_version="main"):
         deck_file = repository_path / f"{deck.id}.txt"
         old_list = deck.list
         deck.load_from_id(deck.id)
         if old_list == deck.list:
             return
-        _git('checkout', deck.id)
+        _git('checkout', f"{deck.id}/{active_version}")
         with deck_file.open("w") as fp:
             fp.write(deck.list)
         _git('add', deck_file)

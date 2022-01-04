@@ -20,14 +20,49 @@ class MainWindow(QtWidgets.QMainWindow):
         self.action_add_deck.triggered.connect(self.add_deck)
         self.moxsafe = moxsafe.Moxsafe()
 
+        self.deckSwitch.addItem("")
         self.deckSwitch.addItems([x['name'] for x in self.moxsafe.index])
-        self.deckSwitch.currentIndexChanged.connect(self.update_list)
+        self.deckSwitch.currentIndexChanged.connect(self.update_deck_list)
 
-        self.list_template_model = QtGui.QStandardItemModel()
-        self.card_list.setModel(self.list_template_model)
+        self.version_switch.currentIndexChanged.connect(self.update_version_list)
+
+        self.card_list_model = QtGui.QStandardItemModel()
+        self.card_list.setModel(self.card_list_model)
         self.card_list.clicked.connect(self.update_picture)
 
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
+        self.new_version_btn.clicked.connect(self.add_version)
+
+    def _update_deck_list(self, deck_name, version_name):
+        deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)), version_name)
+        for card in deck.mainboard:
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
+            self.card_list_model.appendRow(item)
+        return deck
+
+    def _update_version_dropdown(self, deck, version_name):
+        self.version_switch.clear()
+        self.version_switch.addItems([name for name in self.moxsafe.versions(deck)])
+        self.version_switch.setCurrentText(version_name)
+
+    def update_version_list(self):
+        deck_name = self.deckSwitch.currentText()
+        version_name = self.version_switch.currentText()
+        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+
+        version_name = version_name if version_name else "main"
+        self._update_deck_list(deck_name, version_name)
+
+    def update_deck_list(self):
+        deck_name = self.deckSwitch.currentText()
+        version_name = self.version_switch.currentText()
+        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+        self.version_switch.clear()
+        if not deck_name:
+            return
+        version_name = version_name if version_name else "main"
+        deck = self._update_deck_list(deck_name, version_name)
+        self._update_version_dropdown(deck, version_name)
 
     def update_picture(self, index):
         item_text = index.data()
@@ -46,24 +81,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def _save_snapshot(self, comment):
         deck_name = self.deckSwitch.currentText()
         deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
-        self.moxsafe.add_version(deck, comment)
-        self.list_template_model.removeRows(0, self.list_template_model.rowCount())
+        based_on = self.version_switch.currentText()
+
+        self.moxsafe.add_snapshot(deck, comment, based_on)
+        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
         for card in deck.mainboard:
             item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
-            self.list_template_model.appendRow(item)
+            self.card_list_model.appendRow(item)
 
     def save_snapshot(self):
         dialog = save_dialog.SaveDialog()
         dialog.add_deck_signal.connect(lambda: self._save_snapshot(dialog.lineEdit.text()))
         dialog.exec_()
-
-    def update_list(self):
-        deck_name = self.deckSwitch.currentText()
-        deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
-        self.list_template_model.removeRows(0, self.list_template_model.rowCount())
-        for card in deck.mainboard:
-            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
-            self.list_template_model.appendRow(item)
 
     def _add_deck(self, deck):
         _, deck_id = deck.split("/decks/")
@@ -74,6 +103,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def add_deck(self):
         dialog = save_dialog.SaveDialog()
         dialog.add_deck_signal.connect(lambda: self._add_deck(dialog.lineEdit.text()))
+        dialog.exec_()
+
+    def _add_version(self, version_name):
+        deck_name = self.deckSwitch.currentText()
+        based_on = self.version_switch.currentText()
+        deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
+        self.moxsafe.add_version(deck, based_on, version_name)
+
+        self.version_switch.blockSignals(True)
+        self.version_switch.addItem(version_name)
+        self.version_switch.setCurrentText(version_name)
+        self.version_switch.blockSignals(False)
+
+    def add_version(self):
+        dialog = save_dialog.SaveDialog()
+        dialog.add_deck_signal.connect(lambda: self._add_version(dialog.lineEdit.text()))
         dialog.exec_()
 
 

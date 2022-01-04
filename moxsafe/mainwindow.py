@@ -22,9 +22,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.deckSwitch.addItem("")
         self.deckSwitch.addItems([x['name'] for x in self.moxsafe.index])
-        self.deckSwitch.currentIndexChanged.connect(self.update_deck_list)
+        self.deckSwitch.currentIndexChanged.connect(self.deck_dropdown_callback)
 
-        self.version_switch.currentIndexChanged.connect(self.update_version_list)
+        self.version_switch.currentIndexChanged.connect(self.version_dropdown_callback)
 
         self.card_list_model = QtGui.QStandardItemModel()
         self.card_list.setModel(self.card_list_model)
@@ -33,36 +33,41 @@ class MainWindow(QtWidgets.QMainWindow):
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
         self.new_version_btn.clicked.connect(self.add_version)
 
-    def _update_deck_list(self, deck_name, version_name):
-        deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)), version_name)
+    def get_deck(self, name, version_name):
+        version_name = version_name if version_name else "main"
+        return self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == name)), version_name)
+
+    def _update_deck_list(self, deck):
         for card in deck.mainboard:
             item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
             self.card_list_model.appendRow(item)
-        return deck
 
     def _update_version_dropdown(self, deck, version_name):
-        self.version_switch.clear()
+        version_name = version_name if version_name else "main"
+        self.version_switch.blockSignals(True)
         self.version_switch.addItems([name for name in self.moxsafe.versions(deck)])
         self.version_switch.setCurrentText(version_name)
+        self.version_switch.blockSignals(False)
 
-    def update_version_list(self):
+    def deck_dropdown_callback(self):
         deck_name = self.deckSwitch.currentText()
         version_name = self.version_switch.currentText()
         self.card_list_model.removeRows(0, self.card_list_model.rowCount())
-
-        version_name = version_name if version_name else "main"
-        self._update_deck_list(deck_name, version_name)
-
-    def update_deck_list(self):
-        deck_name = self.deckSwitch.currentText()
-        version_name = self.version_switch.currentText()
-        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
-        self.version_switch.clear()
         if not deck_name:
+            self.version_switch.clear()
             return
-        version_name = version_name if version_name else "main"
-        deck = self._update_deck_list(deck_name, version_name)
+
+        deck = self.get_deck(deck_name, version_name)
+        self._update_deck_list(deck)
         self._update_version_dropdown(deck, version_name)
+
+    def version_dropdown_callback(self):
+        deck_name = self.deckSwitch.currentText()
+        version_name = self.version_switch.currentText()
+        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+
+        deck = self.get_deck(deck_name, version_name)
+        self._update_deck_list(deck)
 
     def update_picture(self, index):
         item_text = index.data()

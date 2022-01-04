@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 
-from moxsafe import __version__ as version
+from __init__ import __version__ as version
 
 NEW_ISSUE_URL = 'https://github.com/Jerakin/FakemonCreator/issues/new'
 

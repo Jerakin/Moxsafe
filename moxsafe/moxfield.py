@@ -22,8 +22,27 @@ class Deck:
         return False
 
     def load_from_file(self, file_name):
-        self._content = {}
-        return False
+        with file_name.open() as fp:
+            content = fp.read()
+
+        if "mainboard" not in self._content:
+            self._content["mainboard"] = {}
+        if "sideboard" not in self._content:
+            self._content["sideboard"] = {}
+        if "maybeboard" not in self._content:
+            self._content["maybeboard"] = {}
+
+        add_to = self._content["mainboard"]
+        for line in content.split("\n"):
+            if line.startswith("#") or not line:
+                continue
+            quantity, *card_name = line.split(" ")
+            add_to[" ".join(card_name)] = {"quantity": quantity}
+            if line == "#sideboard":
+                add_to = self._content["sideboard"]
+            elif line == "#considering":
+                add_to = self._content["maybeboard"]
+        return True
 
     def _board(self, type_):
         main = self._content.get(type_, {})

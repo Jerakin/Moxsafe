@@ -24,8 +24,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.deckSwitch.currentIndexChanged.connect(self.update_list)
 
         self.list_template_model = QtGui.QStandardItemModel()
-        self.list_template.setModel(self.list_template_model)
-        self.list_template.clicked.connect(self.update_picture)
+        self.card_list.setModel(self.list_template_model)
+        self.card_list.clicked.connect(self.update_picture)
 
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
 

@@ -25,13 +25,39 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.list_template_model = QtGui.QStandardItemModel()
         self.list_template.setModel(self.list_template_model)
+        self.list_template.clicked.connect(self.update_picture)
+
+        self.save_snapshot_btn.clicked.connect(self.save_snapshot)
+
+    def update_picture(self, index):
+        item_text = index.data()
+        _, *name = item_text.split(" ")
+        image_path = scryfall.get_image(" ".join(name))
+
+        image = QtGui.QImage(image_path.as_posix())
+        pixmap = QtGui.QPixmap.fromImage(image)
+        pixmap_image = QtGui.QPixmap(pixmap)
+
+        self.card_image.setPixmap(pixmap_image)
+        self.card_image.setMaximumSize(250, int(250*(pixmap_image.height()/pixmap_image.width())))
+        self.card_image.setScaledContents(True)
+        self.card_image.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+
+    def save_snapshot(self):
+        deck_name = self.deckSwitch.currentText()
+        deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
+        self.moxsafe.add_version(deck)
+        self.list_template_model.removeRows(0, self.list_template_model.rowCount())
+        for card in deck.mainboard:
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
+            self.list_template_model.appendRow(item)
 
     def update_list(self):
         deck_name = self.deckSwitch.currentText()
         deck = self.moxsafe.get_deck(next((x['id'] for x in self.moxsafe.index if x['name'] == deck_name)))
         self.list_template_model.removeRows(0, self.list_template_model.rowCount())
         for card in deck.mainboard:
-            item = QtGui.QStandardItem(" ".join(card))
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
             self.list_template_model.appendRow(item)
 
     def _add_deck(self, deck):

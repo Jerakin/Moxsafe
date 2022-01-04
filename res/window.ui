@@ -16,22 +16,11 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-        <item>
-         <widget class="QComboBox" name="deckSwitch"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="save_snapshot">
-          <property name="text">
-           <string>Snapshot</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <item row="0" column="0" rowspan="3">
        <widget class="QLabel" name="card_image">
         <property name="minimumSize">
          <size>
@@ -40,11 +29,41 @@
          </size>
         </property>
         <property name="text">
-         <string> </string>
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+        <item>
+         <widget class="QComboBox" name="deckSwitch"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="save_snapshot_btn">
+          <property name="text">
+           <string>Snapshot</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="1" rowspan="3">
        <widget class="QListView" name="list_template"/>
       </item>
      </layout>

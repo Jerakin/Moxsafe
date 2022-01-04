@@ -2,18 +2,22 @@ from pathlib import Path
 import requests
 import shutil
 
-repository_path = Path("~").expanduser() / ".moxsafe" / "image_cache"
+image_cache = Path("~").expanduser() / ".moxsafe" / "image_cache"
+if not image_cache.exists():
+    image_cache.mkdir()
 
 
 def get_image(name):
-    image_path = repository_path / "{name}.png"
+    image_path = image_cache / f"{name}.png"
     if image_path.exists():
         return image_path
-    # Load the card data from Scryfall
     card = requests.get(f"https://api.scryfall.com/cards/search?q={name}").json()
 
     # Get the image URL
-    img_url = card['data'][0]['image_uris']['png']
-    with open('image.png', 'wb') as out_file:
+    if "card_faces" in card['data'][0]:
+        img_url = card['data'][0]["card_faces"][0]['image_uris']['normal']
+    else:
+        img_url = card['data'][0]['image_uris']['normal']
+    with image_path.open('wb') as out_file:
         shutil.copyfileobj(requests.get(img_url, stream=True).raw, out_file)
     return image_path

@@ -25,6 +25,8 @@ class Deck:
         with file_name.open() as fp:
             content = fp.read()
 
+        self._content['publicId'] = file_name.stem
+
         if "mainboard" not in self._content:
             self._content["mainboard"] = {}
         if "sideboard" not in self._content:
@@ -37,7 +39,7 @@ class Deck:
             if line.startswith("#") or not line:
                 continue
             quantity, *card_name = line.split(" ")
-            add_to[" ".join(card_name)] = {"quantity": quantity}
+            add_to[" ".join(card_name)] = {"quantity": int(quantity)}
             if line == "#sideboard":
                 add_to = self._content["sideboard"]
             elif line == "#considering":

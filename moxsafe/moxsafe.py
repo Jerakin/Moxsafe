@@ -62,8 +62,11 @@ class Moxsafe:
             return True
 
     @staticmethod
-    def get_deck(deck_id, version_name="main"):
-        _git('checkout', f"{deck_id}/{version_name}")
+    def get_deck(deck_id, version_name="main", at_sha=None):
+        if at_sha:
+            _git('checkout', at_sha)
+        else:
+            _git('checkout', f"{deck_id}/{version_name}")
         deck = moxfield.Deck(deck_file=repository_path / f"{deck_id}.txt")
         _git('checkout', 'main')
         return deck
@@ -97,8 +100,8 @@ class Moxsafe:
     def index(self):
         return self._index["index"]
 
-    def add_version(self, deck: moxfield.Deck, based_on, version_name="main"):
-        _git('checkout', f"{deck.id}/{based_on}")
+    def add_version(self, deck: moxfield.Deck, version_name="main"):
+        _git('checkout', self._root_sha)
         _git('checkout', "-b", f"{deck.id}/{version_name}")
 
     def add_snapshot(self, deck: moxfield.Deck, comment, active_version="main"):
@@ -113,6 +116,16 @@ class Moxsafe:
         _git('add', deck_file)
         _git('commit', "-m", comment if comment else "Update")
         _git('checkout', "main")
+
+    def version_history(self, deck, version_name='main'):
+        _git('checkout', f"{deck.id}/{version_name}")
+        output = subprocess.check_output('git log --format="format:%H$$%cs$$%s%N"', shell=True)
+        history = []
+        for line in output.decode("utf-8").split("\n"):
+            line = line.split('$$')
+            if 'initial commit' not in line:
+                history.append(line)
+        return history
 
 
 if __name__ == '__main__':

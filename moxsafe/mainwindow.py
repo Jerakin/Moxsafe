@@ -19,6 +19,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.action_add_deck.triggered.connect(self.add_deck)
         self.moxsafe = moxsafe.Moxsafe()
+        self.website = moxfield.Website()
 
         self.deckSwitch.addItem("")
         self.deckSwitch.addItems([x['name'] for x in self.moxsafe.index])
@@ -36,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
         self.new_version_btn.clicked.connect(self.add_version)
+        self.restore_btn.clicked.connect(self.restore_version)
 
     def get_deck(self, name, version_name=None, at_sha=None):
         version_name = version_name if version_name else "main"
@@ -63,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         deck_name = self.deckSwitch.currentText()
         self.card_list_model.removeRows(0, self.card_list_model.rowCount())
         self.deck_history_model.removeRows(0, self.deck_history_model.rowCount())
-            self.version_switch.clear()
+        self.version_switch.clear()
         if not deck_name:
             return
 
@@ -80,7 +82,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if index.row() == 0:
             deck = self.get_deck(deck_name, version_name=self.version_switch.currentText())
         else:
-        deck = self.get_deck(deck_name, at_sha=index.data(1))
+            deck = self.get_deck(deck_name, at_sha=index.data(1))
         self._update_deck_list(deck)
 
     def version_dropdown_callback(self):
@@ -149,6 +151,17 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog = save_dialog.SaveDialog()
         dialog.add_deck_signal.connect(lambda: self._add_version(dialog.lineEdit.text()))
         dialog.exec_()
+
+    def restore_version(self):
+        specific_version = self.deck_history.selectedIndexes()
+        deck_name = self.deckSwitch.currentText()
+
+        if specific_version:
+            sha = specific_version[0].data(1)
+            deck = self.get_deck(deck_name, at_sha=sha)
+        else:
+            deck = self.get_deck(deck_name, version_name=self.version_switch.currentText())
+        self.website.bulk_edit(deck)
 
 
 def main():

@@ -8,6 +8,7 @@ import save_dialog
 import moxfield
 import moxsafe
 import scryfall
+import widgets
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -27,17 +28,62 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.version_switch.activated.connect(self.version_dropdown_callback)
 
-        self.card_list_model = QtGui.QStandardItemModel()
-        self.card_list.setModel(self.card_list_model)
-        self.card_list.clicked.connect(self.update_picture)
+        self.mainboard_card_list = widgets.CardList()
+        self.commander_cards = widgets.CardList()
+        self.sideboard_card_list = widgets.CardList()
+        self.consider_card_list = widgets.CardList()
+
+        self.commander_cards_model = QtGui.QStandardItemModel()
+        self.commander_cards.setModel(self.commander_cards_model)
+        self.commander_cards.clicked.connect(self.update_picture)
+
+        self.mainboard_card_list_model = QtGui.QStandardItemModel()
+        self.mainboard_card_list.setModel(self.mainboard_card_list_model)
+        self.mainboard_card_list.clicked.connect(self.update_picture)
+
+        self.sideboard_card_list_model = QtGui.QStandardItemModel()
+        self.sideboard_card_list.setModel(self.sideboard_card_list_model)
+        self.sideboard_card_list.clicked.connect(self.update_picture)
+
+        self.consider_card_list_model = QtGui.QStandardItemModel()
+        self.consider_card_list.setModel(self.consider_card_list_model)
+        self.consider_card_list.clicked.connect(self.update_picture)
 
         self.deck_history_model = QtGui.QStandardItemModel()
         self.deck_history.setModel(self.deck_history_model)
         self.deck_history.clicked.connect(self.version_list_callback)
 
+        self.left_card_list_layout.insertWidget(0, self.mainboard_card_list)
+        self.left_card_list_layout.insertWidget(0, self.commander_cards)
+        self.right_card_list_layout.insertWidget(0, self.consider_card_list)
+        self.right_card_list_layout.insertWidget(0, self.sideboard_card_list)
+
+        self.commander_cards.hide()
+
+        self.mainboard_card_list.hide()
+        self.sideboard_card_list.hide()
+        self.consider_card_list.hide()
+
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHorizontalStretch(1)
+
+        self.mainboard_card_list.setSizePolicy(sizePolicy)
+        self.sideboard_card_list.setSizePolicy(sizePolicy)
+        self.consider_card_list.setSizePolicy(sizePolicy)
+
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
         self.new_version_btn.clicked.connect(self.add_version)
         self.restore_btn.clicked.connect(self.restore_version)
+
+    def setup_list_widgets(self, deck):
+        self.commander_cards.setVisible(bool(deck.commanders))
+        self.mainboard_card_list.setVisible(bool(deck.mainboard))
+        self.sideboard_card_list.setVisible(bool(deck.sideboard))
+        self.consider_card_list.setVisible(bool(deck.considering))
+        self.commander_cards.setFixedHeight(self.commander_cards.sizeHintForRow(0) *
+                                            self.commander_cards_model.rowCount() +
+                                            2 * self.commander_cards.frameWidth())
 
     def get_deck(self, name, version_name=None, at_sha=None):
         version_name = version_name if version_name else "main"
@@ -46,7 +92,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def _update_deck_list(self, deck):
         for card in deck.mainboard:
             item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
-            self.card_list_model.appendRow(item)
+            self.mainboard_card_list_model.appendRow(item)
+        for card in deck.sideboard:
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
+            self.sideboard_card_list_model.appendRow(item)
+        for card in deck.considering:
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
+            self.consider_card_list_model.appendRow(item)
+        for card in deck.commanders:
+            item = QtGui.QStandardItem(" ".join([str(c) for c in card]))
+            self.commander_cards_model.appendRow(item)
+        self.setup_list_widgets(deck)
 
     def _update_version_dropdown(self, deck, version_name=None):
         version_name = version_name if version_name else "main"
@@ -61,9 +117,15 @@ class MainWindow(QtWidgets.QMainWindow):
             item.setData(sha, 1)
             self.deck_history_model.appendRow(item)
 
+    def _clear_card_lists(self):
+        self.commander_cards_model.removeRows(0, self.commander_cards_model.rowCount())
+        self.mainboard_card_list_model.removeRows(0, self.mainboard_card_list_model.rowCount())
+        self.sideboard_card_list_model.removeRows(0, self.sideboard_card_list_model.rowCount())
+        self.consider_card_list_model.removeRows(0, self.consider_card_list_model.rowCount())
+
     def deck_dropdown_callback(self):
         deck_name = self.deckSwitch.currentText()
-        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+        self._clear_card_lists()
         self.deck_history_model.removeRows(0, self.deck_history_model.rowCount())
         self.version_switch.clear()
         if not deck_name:
@@ -76,7 +138,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def version_list_callback(self, index):
         deck_name = self.deckSwitch.currentText()
-        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+        self._clear_card_lists()
         if not deck_name:
             return
         if index.row() == 0:
@@ -88,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def version_dropdown_callback(self):
         deck_name = self.deckSwitch.currentText()
         version_name = self.version_switch.currentText()
-        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+        self._clear_card_lists()
         self.deck_history_model.removeRows(0, self.deck_history_model.rowCount())
         if not deck_name:
             return
@@ -116,7 +178,7 @@ class MainWindow(QtWidgets.QMainWindow):
         based_on = self.version_switch.currentText()
 
         self.moxsafe.add_snapshot(deck, comment, based_on)
-        self.card_list_model.removeRows(0, self.card_list_model.rowCount())
+        self.mainboard_card_list_model.removeRows(0, self.mainboard_card_list_model.rowCount())
         self.deck_history_model.removeRows(0, self.deck_history_model.rowCount())
         self._update_deck_list(deck)
         self._update_version_list(deck, based_on)

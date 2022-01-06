@@ -6,21 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>902</width>
-    <height>763</height>
+    <width>1003</width>
+    <height>678</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,1">
     <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="topMargin">
-       <number>5</number>
-      </property>
-      <item row="0" column="0" rowspan="4">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
        <widget class="QLabel" name="card_image">
         <property name="minimumSize">
          <size>
@@ -36,7 +33,17 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Transform</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -49,46 +56,153 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+      <item>
+       <widget class="QPushButton" name="restore_btn">
+        <property name="text">
+         <string>Restore to Moxfield</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="mid_layout">
+      <item>
+       <layout class="QHBoxLayout" name="deck_layout" stretch="0,2,1">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Deck</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QComboBox" name="deckSwitch"/>
         </item>
         <item>
-         <widget class="QPushButton" name="save_snapshot_btn">
-          <property name="text">
-           <string>Snapshot</string>
-          </property>
-         </widget>
+         <widget class="QComboBox" name="version_switch"/>
         </item>
        </layout>
       </item>
-      <item row="1" column="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+      <item>
+       <layout class="QHBoxLayout" name="new_version_layout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
         <item>
-         <widget class="QComboBox" name="version_switch"/>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="new_version_btn">
           <property name="text">
-           <string>New</string>
+           <string>Create New Version</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
-      <item row="5" column="0">
-       <widget class="QPushButton" name="restore_btn">
+      <item>
+       <layout class="QHBoxLayout" name="card_layout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="left_card_list_layout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetFixedSize</enum>
+          </property>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="right_card_list_layout">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetFixedSize</enum>
+          </property>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Restore</string>
+         <string>History</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignHCenter|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" rowspan="5">
-       <widget class="QListView" name="card_list"/>
-      </item>
-      <item row="2" column="2" rowspan="4">
+      <item>
        <widget class="QListView" name="deck_history"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="save_snapshot_btn">
+        <property name="text">
+         <string>Save Snapshot</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -99,7 +213,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>902</width>
+     <width>1003</width>
      <height>21</height>
     </rect>
    </property>

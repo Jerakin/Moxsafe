@@ -31,7 +31,8 @@ class Deck:
             content = fp.read()
 
         self._content['publicId'] = file_name.stem
-
+        if "commanders" not in self._content:
+            self._content["commanders"] = {}
         if "mainboard" not in self._content:
             self._content["mainboard"] = {}
         if "sideboard" not in self._content:
@@ -41,19 +42,25 @@ class Deck:
 
         add_to = self._content["mainboard"]
         for line in content.split("\n"):
-            if line.startswith("#") or not line:
-                continue
-            quantity, *card_name = line.split(" ")
-            add_to[" ".join(card_name)] = {"quantity": int(quantity)}
             if line == "#sideboard":
                 add_to = self._content["sideboard"]
             elif line == "#considering":
                 add_to = self._content["maybeboard"]
+            elif line == "#commanders":
+                add_to = self._content["commanders"]
+            if line.startswith("#") or not line:
+                continue
+            quantity, *card_name = line.split(" ")
+            add_to[" ".join(card_name)] = {"quantity": int(quantity)}
         return True
 
     def _board(self, type_):
         main = self._content.get(type_, {})
         return sorted([(data['quantity'], name) for name, data in main.items()], key=lambda x: x[1])
+
+    @property
+    def commanders(self):
+        return self._board("commanders")
 
     @property
     def mainboard(self):
@@ -72,6 +79,11 @@ class Deck:
         t = ""
         if self.mainboard:
             for q, n in self.mainboard:
+                t += f"{q} {n}\n"
+
+        if self.commanders:
+            t += "\n#commanders\n"
+            for q, n in self.commanders:
                 t += f"{q} {n}\n"
 
         if self.sideboard:

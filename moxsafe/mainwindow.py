@@ -263,6 +263,18 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog.exec_()
 
     def restore_version(self):
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+        msg_box.setText(
+            f"Restoring the current version to Moxfield will overwrite your current Moxfield list. "
+            f"Are you sure you want to do this?")
+        msg_box.setWindowTitle("Warning")
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+
+        return_value = msg_box.exec()
+        if return_value != QtWidgets.QMessageBox.Ok:
+            return
+
         specific_version = self.deck_history.selectedIndexes()
         deck_name = self.deckSwitch.currentText()
         if not deck_name:

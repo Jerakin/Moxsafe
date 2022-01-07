@@ -14,7 +14,7 @@ def get_image(name):
     if image_path.exists():
         return image_path
     card = requests.get(f"https://api.scryfall.com/cards/named?exact={name}").json()
-    print(card)
+
     # Get the image URL
     if "card_faces" in card:
         img_url = card["card_faces"][0]['image_uris']['normal']

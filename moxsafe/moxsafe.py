@@ -133,6 +133,8 @@ class Moxsafe:
         _git("checkout", "main")
         output = subprocess.check_output(f'git branch --list "{deck.id}/*"', shell=True)
         for line in output.decode("utf-8").split("\n"):
+            if not line:
+                continue
             _git("branch", "-d", f"{line.strip()}")
 
         for deck_entry in self.index:

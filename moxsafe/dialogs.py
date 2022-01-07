@@ -45,7 +45,6 @@ class SettingsDialog(QtWidgets.QDialog):
         self.cancel_btn.clicked.connect(self.close)
         self.ok_btn.clicked.connect(self.ok)
         self.delete_btn.clicked.connect(self.delete)
-        self.url_btn.clicked.connect(self.change_url)
         self.refresh_name_btn.clicked.connect(self.refresh)
 
         exit_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self)
@@ -66,19 +65,6 @@ class SettingsDialog(QtWidgets.QDialog):
         self.deck.load_from_id(self.deck.id)
         self._deck_data["name"] = self.deck.name
         self.name_lbl.setText(self.deck.name)
-
-    def _change_url(self, url):
-        _, deck_id = url.split("/decks/")
-        self._deck_data["id"] = deck_id
-        url = f'https://www.moxfield.com/decks/{deck_id}'
-        self.url_lbl.setText(f'<a href="{url}"><span style="color:#c999e6;">{url}</a>')
-
-    def change_url(self):
-        dialog = SaveDialog()
-        dialog.setStyleSheet(STYLESHEET)
-        dialog.setWindowTitle("Change URL | Moxfield Deck URL")
-        dialog.add_deck_signal.connect(lambda: self._change_url(dialog.lineEdit.text()))
-        dialog.exec_()
 
     def delete(self):
         msg_box = QtWidgets.QMessageBox()

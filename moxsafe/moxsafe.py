@@ -61,14 +61,16 @@ class Moxsafe:
         else:
             return True
 
-    @staticmethod
-    def get_deck(deck_id, version_name="main", at_sha=None):
+    def get_deck(self, deck_id, version_name="main", at_sha=None):
         if at_sha:
             _git('checkout', at_sha)
         else:
             _git('checkout', f"{deck_id}/{version_name}")
         deck = moxfield.Deck(deck_file=repository_path / f"{deck_id}.txt")
         _git('checkout', 'main')
+        for deck_entry in self.index:
+            if deck.id == deck_entry["id"]:
+                deck._content["name"] = deck_entry["name"]
         return deck
 
     def add_deck(self, deck: moxfield.Deck):
@@ -126,6 +128,35 @@ class Moxsafe:
             if 'initial commit' not in line:
                 history.append(line)
         return history
+
+    def delete(self, deck):
+        _git("checkout", "main")
+        output = subprocess.check_output(f'git branch --list "{deck.id}/*"', shell=True)
+        for line in output.decode("utf-8").split("\n"):
+            _git("branch", "-d", f"{line.strip()}")
+
+        for deck_entry in self.index:
+            if deck.id == deck_entry["id"]:
+                self.index.remove(deck_entry)
+                break
+        with self._index_file.open("w") as fp:
+            json.dump(self._index, fp)
+        _git('add', self._index_file)
+        _git('commit', "-m", f"Removed {deck.name}")
+
+    def update_index(self, deck, index_entry):
+        if index_entry["id"] or index_entry["name"]:
+            pass
+        else:
+            return
+        for deck_entry in self.index:
+            if deck.id == deck_entry["id"]:
+                deck_entry["name"] = index_entry["name"] if index_entry["name"] else deck_entry["name"]
+                with self._index_file.open("w") as fp:
+                    json.dump(self._index, fp)
+                _git('add', self._index_file)
+                _git('commit', "-m", f"Updated index for {deck.name}")
+                break
 
 
 if __name__ == '__main__':

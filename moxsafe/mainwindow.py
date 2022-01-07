@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 import exception
-import save_dialog
+import dialogs
 import moxfield
 import moxsafe
 import scryfall
@@ -20,6 +20,8 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi(Path(__file__).parent.parent / "res" / 'window.ui', self)
 
         self.action_add_deck.triggered.connect(self.add_deck)
+        self.actionExit.triggered.connect(self.close)
+        self.actionEdit_Deck.triggered.connect(self.edit_deck)
         self.moxsafe = moxsafe.Moxsafe()
         self.website = moxfield.Website()
 
@@ -140,6 +142,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._update_deck_list(deck)
         self._update_version_dropdown(deck)
         self._update_version_list(deck)
+        index = None
+        if self.commander_cards.isVisible():
+            index = self.commander_cards_model.index(0, 0)
+        elif self.mainboard_card_list.isVisible():
+            index = self.mainboard_card_list_model.index(0, 0)
+        elif self.sideboard_card_list.isVisible():
+            index = self.sideboard_card_list_model.index(0, 0)
+        elif self.consider_card_list.isVisible():
+            index = self.consider_card_list.index(0, 0)
+        if index:
+            self.update_picture(index)
 
     def version_list_callback(self, index):
         deck_name = self.deckSwitch.currentText()
@@ -163,7 +176,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._update_deck_list(deck)
         self._update_version_list(deck, version_name)
 
-    def update_picture(self, index):
+    def update_picture(self, index=None):
+        if index is None:
+            self.card_image.clear()
+            return
+
         item_text = index.data()
         _, *name = item_text.split(" ")
         image_path = scryfall.get_image(" ".join(name))
@@ -189,8 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._update_version_list(deck, based_on)
 
     def save_snapshot(self):
-        dialog = save_dialog.SaveDialog()
-        dialog.setStyleSheet(STYLESHEET)
+        dialog = dialogs.SaveDialog()
         dialog.setWindowTitle("Save Snapshot | Add Comment")
         dialog.add_deck_signal.connect(lambda: self._save_snapshot(dialog.lineEdit.text()))
         dialog.exec_()
@@ -201,9 +217,38 @@ class MainWindow(QtWidgets.QMainWindow):
         self.moxsafe.add_deck(deck)
         self.deckSwitch.addItem(deck.name)
 
+    def _deck_edited(self, deck_id):
+        self.moxsafe._reload_index()
+        deck = self.moxsafe.get_deck(deck_id=deck_id)
+        self.deckSwitch.clear()
+        self.deckSwitch.addItem("")
+        self.deckSwitch.addItems([x['name'] for x in self.moxsafe.index])
+        self.deckSwitch.setCurrentText(deck.name)
+
+    def _deck_deleted(self, deck_id):
+        self.moxsafe._reload_index()
+        self.deckSwitch.clear()
+        self.deckSwitch.addItem("")
+        self.deckSwitch.addItems([x['name'] for x in self.moxsafe.index])
+        self.deckSwitch.setCurrentText("")
+        self.update_picture()
+        self._clear_card_lists()
+        self.deck_history_model.removeRows(0, self.deck_history_model.rowCount())
+        self.version_switch.clear()
+        self.commander_cards.hide()
+        self.mainboard_card_list.hide()
+        self.sideboard_card_list.hide()
+        self.consider_card_list.hide()
+
+    def edit_deck(self):
+        dialog = dialogs.SettingsDialog()
+        dialog.accepted_settings_signal.connect(self._deck_edited)
+        dialog.deck_deleted_signal.connect(self._deck_deleted)
+        dialog.set_deck(self.get_deck(self.deckSwitch.currentText(), version_name=self.version_switch.currentText()))
+        dialog.exec_()
+
     def add_deck(self):
-        dialog = save_dialog.SaveDialog()
-        dialog.setStyleSheet(STYLESHEET)
+        dialog = dialogs.SaveDialog()
         dialog.setWindowTitle("Add Deck | Moxfield Deck URL")
         dialog.add_deck_signal.connect(lambda: self._add_deck(dialog.lineEdit.text()))
         dialog.exec_()
@@ -219,7 +264,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.version_switch.blockSignals(False)
 
     def add_version(self):
-        dialog = save_dialog.SaveDialog()
+        dialog = dialogs.SaveDialog()
         dialog.add_deck_signal.connect(lambda: self._add_version(dialog.lineEdit.text()))
         dialog.exec_()
 

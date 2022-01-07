@@ -11,7 +11,7 @@ from PyQt5 import QtWidgets
 
 from __init__ import __version__ as version
 
-NEW_ISSUE_URL = 'https://github.com/Jerakin/FakemonCreator/issues/new'
+NEW_ISSUE_URL = 'https://github.com/Jerakin/Moxsafe/issues/new'
 
 
 class ExceptionWindow(QtWidgets.QWidget):
@@ -23,7 +23,7 @@ class ExceptionWindow(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout()
 
         information_label = QtWidgets.QLabel()
-        information_label.setText('The Moxfield Backup just crashed. An '
+        information_label.setText('Moxsafe just crashed. An '
             'unhandled exception was raised. Here are the details.'
                                   )
         layout.addWidget(information_label, 0, 0)
@@ -68,7 +68,7 @@ class ExceptionWindow(QtWidgets.QWidget):
         report_label = QtWidgets.QLabel()
         report_label.setOpenExternalLinks(True)
         report_label.setText('Please help me by reporting this '
-            '<a href="{url}">by reporting this issue on GitHub</a>.'
+            '<a href="{url}"><span style="color:white;">by reporting this issue on GitHub</span></a>.'
                              ' If are not on github send the error to Jerakin'.format(
                 url=html.escape(report_url)))
         layout.addWidget(report_label, 2, 0)

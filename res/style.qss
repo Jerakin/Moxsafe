@@ -7,18 +7,16 @@ QDialog {
 	color: #d3dae3;
 }
 
+QWidget {
+	background-color:#222222;
+	color: #d3dae3;
+}
+
 QDialog:focus {
   	background-color: #52525e;
 	color: #d3dae3;
     border-style: none;
     border-bottom: 1px solid rgb(0,0,0);
-}
-
-QApplication QFrame{
-    background:  #D700D7;
-    color:white;
-    font:13px ;
-    font-weight:bold;
 }
 
 QLineEdit {

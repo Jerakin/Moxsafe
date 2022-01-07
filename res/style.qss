@@ -178,8 +178,9 @@ QTableView::item:hover {
 
 QListView {
 	color: #bbbbbb;
-    border-width: 0px;
-    border: none;
+    border-style: none;
+    border-bottom: 1px solid #313131;
+    border-left: 1px solid #313131;
 	background-color: #222222;
     outline: none;
 }

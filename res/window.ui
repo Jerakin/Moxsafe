@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1003</width>
-    <height>678</height>
+    <width>1234</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,16 +47,32 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="restore_btn">
-        <property name="text">
-         <string>Restore to Moxfield</string>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="restore_btn">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Restore to Moxfield</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="mid_layout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="deck_layout" stretch="0,2,1">
         <property name="sizeConstraint">
@@ -188,11 +204,24 @@
        <widget class="QListView" name="deck_history"/>
       </item>
       <item>
-       <widget class="QPushButton" name="save_snapshot_btn">
-        <property name="text">
-         <string>Save Snapshot</string>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>0</number>
         </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="save_snapshot_btn">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Save Snapshot</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -203,7 +232,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1003</width>
+     <width>1234</width>
      <height>21</height>
     </rect>
    </property>

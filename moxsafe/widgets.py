@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QListView
+from PyQt5.QtWidgets import QListView, QTableView
 
 
-class CardList(QListView):
+class CardList(QTableView):
     def __init__(self):
         self.uses_fixed_size = False
         super(CardList, self).__init__()

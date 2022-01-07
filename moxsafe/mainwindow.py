@@ -34,20 +34,40 @@ class MainWindow(QtWidgets.QMainWindow):
         self.consider_card_list = widgets.CardList()
 
         self.commander_cards_model = QtGui.QStandardItemModel()
+        self.commander_cards_model.setHorizontalHeaderLabels(["Commander"])
         self.commander_cards.setModel(self.commander_cards_model)
         self.commander_cards.clicked.connect(self.update_picture)
+        self.commander_cards.verticalHeader().hide()
+        self.commander_cards.horizontalHeader().setStretchLastSection(True)
+        self.commander_cards.horizontalHeader().setSectionsClickable(False)
+        self.commander_cards.setShowGrid(False)
 
         self.mainboard_card_list_model = QtGui.QStandardItemModel()
+        self.mainboard_card_list_model.setHorizontalHeaderLabels(["Mainboard"])
         self.mainboard_card_list.setModel(self.mainboard_card_list_model)
         self.mainboard_card_list.clicked.connect(self.update_picture)
+        self.mainboard_card_list.verticalHeader().hide()
+        self.mainboard_card_list.horizontalHeader().setStretchLastSection(True)
+        self.mainboard_card_list.horizontalHeader().setSectionsClickable(False)
+        self.mainboard_card_list.setShowGrid(False)
 
         self.sideboard_card_list_model = QtGui.QStandardItemModel()
+        self.sideboard_card_list_model.setHorizontalHeaderLabels(["Sideboard"])
         self.sideboard_card_list.setModel(self.sideboard_card_list_model)
         self.sideboard_card_list.clicked.connect(self.update_picture)
+        self.sideboard_card_list.verticalHeader().hide()
+        self.sideboard_card_list.horizontalHeader().setStretchLastSection(True)
+        self.sideboard_card_list.horizontalHeader().setSectionsClickable(False)
+        self.sideboard_card_list.setShowGrid(False)
 
         self.consider_card_list_model = QtGui.QStandardItemModel()
+        self.consider_card_list_model.setHorizontalHeaderLabels(["Considering"])
         self.consider_card_list.setModel(self.consider_card_list_model)
         self.consider_card_list.clicked.connect(self.update_picture)
+        self.consider_card_list.verticalHeader().hide()
+        self.consider_card_list.horizontalHeader().setStretchLastSection(True)
+        self.consider_card_list.horizontalHeader().setSectionsClickable(False)
+        self.consider_card_list.setShowGrid(False)
 
         self.deck_history_model = QtGui.QStandardItemModel()
         self.deck_history.setModel(self.deck_history_model)
@@ -83,7 +103,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.consider_card_list.setVisible(bool(deck.considering))
         self.commander_cards.setFixedHeight(self.commander_cards.sizeHintForRow(0) *
                                             self.commander_cards_model.rowCount() +
-                                            2 * self.commander_cards.frameWidth())
+                                            2 * self.commander_cards.frameWidth() +
+                                            self.commander_cards.horizontalHeader().height() + 2)
 
     def get_deck(self, name, version_name=None, at_sha=None):
         version_name = version_name if version_name else "main"

@@ -8,7 +8,6 @@ import dialogs
 import moxfield
 import moxsafe
 import scryfall
-import widgets
 
 with (Path(__file__).parent.parent / "res" / "style.qss").open() as fh:
     STYLESHEET = fh.read()
@@ -31,11 +30,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.version_switch.activated.connect(self.version_dropdown_callback)
 
-        self.mainboard_card_list = widgets.CardList()
-        self.commander_cards = widgets.CardList()
-        self.sideboard_card_list = widgets.CardList()
-        self.consider_card_list = widgets.CardList()
-
         self.commander_cards_model = QtGui.QStandardItemModel()
         self.init_deck_list_properties(self.commander_cards, self.commander_cards_model, "Commander")
 
@@ -52,22 +46,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.deck_history.setModel(self.deck_history_model)
         self.deck_history.clicked.connect(self.version_list_callback)
 
-        self.left_card_list_layout.insertWidget(0, self.mainboard_card_list)
-        self.left_card_list_layout.insertWidget(0, self.commander_cards)
-        self.right_card_list_layout.insertWidget(0, self.consider_card_list)
-        self.right_card_list_layout.insertWidget(0, self.sideboard_card_list)
+        self.splitter = QtWidgets.QSplitter()
+        for i in range(self.horizontalLayout.count()-1):
+            w = self.horizontalLayout.takeAt(1)
+            self.splitter.addWidget(w.widget())
+        self.horizontalLayout.addWidget(self.splitter)
 
         self.commander_cards.hide()
         self.mainboard_card_list.hide()
         self.sideboard_card_list.hide()
         self.consider_card_list.hide()
-
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        size_policy.setVerticalStretch(1)
-        size_policy.setHorizontalStretch(1)
-        self.mainboard_card_list.setSizePolicy(size_policy)
-        self.sideboard_card_list.setSizePolicy(size_policy)
-        self.consider_card_list.setSizePolicy(size_policy)
 
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
         self.new_version_btn.clicked.connect(self.add_version)

@@ -13,16 +13,23 @@ class Deck:
         if deck_id and deck_file:
             raise ValueError("Multiple mutually exclusive arguments used")
 
+        self.version = None
         self._content = {}
         if deck_id:
             self.load_from_id(deck_id)
         if deck_file:
             self.load_from_file(deck_file)
 
-    def load_from_id(self, deck_id):
+    @staticmethod
+    def _get_content(deck_id):
         r = requests.get(_ENDPOINT + deck_id)
         if r.status_code == 200:
-            self._content = r.json()
+            return r.json()
+
+    def load_from_id(self, deck_id):
+        content = self._get_content(deck_id)
+        if content:
+            self._content = content
             return True
         return False
 
@@ -107,7 +114,13 @@ class Deck:
 
     @property
     def author(self):
-        return self._content.get("createdByUser", {}).get("userName", "?")
+        user = self._content.get("createdByUser", {}).get("userName", None)
+        if user is None:
+            content = self._get_content(self.id)
+            if content:
+                self._content["createdByUser"] = {"userName": content.get("publicId", None)}
+            return self._content.get("createdByUser", {}).get("userName", None)
+        return user
 
 
 class Website:

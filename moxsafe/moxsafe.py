@@ -37,6 +37,7 @@ class Moxsafe:
         output = subprocess.check_output('git log --reverse --format=format:%H', shell=True)
         self._root_sha = output.split(b"\n")[0].decode("utf-8")
         self._reload_index()
+        self.deck = moxfield.Deck()
 
     def _reload_index(self):
         _git('checkout', 'main')
@@ -62,16 +63,19 @@ class Moxsafe:
             return True
 
     def get_deck(self, deck_id, version_name="main", at_sha=None):
+        if deck_id == self.deck.id and self.deck.version == version_name:
+            return self.deck
         if at_sha:
             _git('checkout', at_sha)
         else:
             _git('checkout', f"{deck_id}/{version_name}")
-        deck = moxfield.Deck(deck_file=repository_path / f"{deck_id}.txt")
+        self.deck = moxfield.Deck(deck_file=repository_path / f"{deck_id}.txt")
+        self.deck.version = version_name
         _git('checkout', 'main')
         for deck_entry in self.index:
-            if deck.id == deck_entry["id"]:
-                deck._content["name"] = deck_entry["name"]
-        return deck
+            if self.deck.id == deck_entry["id"]:
+                self.deck._content["name"] = deck_entry["name"]
+        return self.deck
 
     def add_deck(self, deck: moxfield.Deck):
         deck_file = repository_path / f"{deck.id}.txt"
@@ -106,6 +110,12 @@ class Moxsafe:
         _git('checkout', self._root_sha)
         _git('checkout', "-b", f"{deck.id}/{version_name}")
 
+        deck_file = repository_path / f"{deck.id}.txt"
+        with deck_file.open("w") as fp:
+            fp.write(deck.list)
+        _git('add', deck_file)
+        _git('commit', "-m", f"{deck.name} by {deck.author}")
+
     def add_snapshot(self, deck: moxfield.Deck, comment, active_version="main"):
         deck_file = repository_path / f"{deck.id}.txt"
         old_list = deck.list
@@ -135,7 +145,7 @@ class Moxsafe:
         for line in output.decode("utf-8").split("\n"):
             if not line:
                 continue
-            _git("branch", "-d", f"{line.strip()}")
+            _git("branch", "-D", f"{line.strip()}")
 
         for deck_entry in self.index:
             if deck.id == deck_entry["id"]:

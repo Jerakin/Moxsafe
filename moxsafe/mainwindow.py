@@ -206,6 +206,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._update_version_list(deck, based_on)
 
     def save_snapshot(self):
+        if not self.deckSwitch.currentText():
+            return
         dialog = dialogs.SaveDialog()
         dialog.setWindowTitle("Save Snapshot | Add Comment")
         dialog.add_deck_signal.connect(lambda: self._save_snapshot(dialog.lineEdit.text()))
@@ -241,6 +243,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.consider_card_list.hide()
 
     def edit_deck(self):
+        if not self.deckSwitch.currentText():
+            return
         dialog = dialogs.SettingsDialog()
         dialog.accepted_settings_signal.connect(self._deck_edited)
         dialog.deck_deleted_signal.connect(self._deck_deleted)
@@ -264,6 +268,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.version_switch.blockSignals(False)
 
     def add_version(self):
+        if not self.deckSwitch.currentText():
+            return
         dialog = dialogs.SaveDialog()
         dialog.add_deck_signal.connect(lambda: self._add_version(dialog.lineEdit.text()))
         dialog.exec_()
@@ -271,7 +277,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def restore_version(self):
         specific_version = self.deck_history.selectedIndexes()
         deck_name = self.deckSwitch.currentText()
-
+        if not deck_name:
+            return
         if specific_version:
             sha = specific_version[0].data(1)
             deck = self.get_deck(deck_name, at_sha=sha)

@@ -10,6 +10,9 @@ import moxsafe
 import scryfall
 import widgets
 
+with (Path(__file__).parent.parent / "res" / "style.qss").open() as fh:
+    STYLESHEET = fh.read()
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -187,6 +190,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_snapshot(self):
         dialog = save_dialog.SaveDialog()
+        dialog.setStyleSheet(STYLESHEET)
+        dialog.setWindowTitle("Save Snapshot | Add Comment")
         dialog.add_deck_signal.connect(lambda: self._save_snapshot(dialog.lineEdit.text()))
         dialog.exec_()
 
@@ -198,6 +203,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_deck(self):
         dialog = save_dialog.SaveDialog()
+        dialog.setStyleSheet(STYLESHEET)
+        dialog.setWindowTitle("Add Deck | Moxfield Deck URL")
         dialog.add_deck_signal.connect(lambda: self._add_deck(dialog.lineEdit.text()))
         dialog.exec_()
 
@@ -231,8 +238,7 @@ class MainWindow(QtWidgets.QMainWindow):
 def main():
     sys.excepthook = exception.ui_exception
     app = QtWidgets.QApplication(sys.argv)
-    with (Path(__file__).parent.parent / "res" / "style.qss").open() as fh:
-        app.setStyleSheet(fh.read())
+    app.setStyleSheet(STYLESHEET)
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())

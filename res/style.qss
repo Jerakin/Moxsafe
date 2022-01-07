@@ -2,6 +2,34 @@ QMainWindow {
 	background-color:#222222;
 }
 
+QDialog {
+	background-color:#222222;
+	color: #d3dae3;
+}
+
+QDialog:focus {
+  	background-color: #52525e;
+	color: #d3dae3;
+    border-style: none;
+    border-bottom: 1px solid rgb(0,0,0);
+}
+
+QApplication QFrame{
+    background:  #D700D7;
+    color:white;
+    font:13px ;
+    font-weight:bold;
+}
+
+QLineEdit {
+	color: #bbbbbb;
+	background-color: #111111;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #000000;
+	border-radius: 5px;
+}
+
 QTextEdit {
 	border-width: 1px;
 	border-style: solid;

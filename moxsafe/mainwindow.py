@@ -12,8 +12,6 @@ import widgets
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    ModernWindow = None
-
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi(Path(__file__).parent.parent / "res" / 'window.ui', self)
@@ -34,40 +32,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.consider_card_list = widgets.CardList()
 
         self.commander_cards_model = QtGui.QStandardItemModel()
-        self.commander_cards_model.setHorizontalHeaderLabels(["Commander"])
-        self.commander_cards.setModel(self.commander_cards_model)
-        self.commander_cards.clicked.connect(self.update_picture)
-        self.commander_cards.verticalHeader().hide()
-        self.commander_cards.horizontalHeader().setStretchLastSection(True)
-        self.commander_cards.horizontalHeader().setSectionsClickable(False)
-        self.commander_cards.setShowGrid(False)
+        self.init_deck_list_properties(self.commander_cards, self.commander_cards_model, "Commander")
 
         self.mainboard_card_list_model = QtGui.QStandardItemModel()
-        self.mainboard_card_list_model.setHorizontalHeaderLabels(["Mainboard"])
-        self.mainboard_card_list.setModel(self.mainboard_card_list_model)
-        self.mainboard_card_list.clicked.connect(self.update_picture)
-        self.mainboard_card_list.verticalHeader().hide()
-        self.mainboard_card_list.horizontalHeader().setStretchLastSection(True)
-        self.mainboard_card_list.horizontalHeader().setSectionsClickable(False)
-        self.mainboard_card_list.setShowGrid(False)
+        self.init_deck_list_properties(self.mainboard_card_list, self.mainboard_card_list_model, "Mainboard")
 
         self.sideboard_card_list_model = QtGui.QStandardItemModel()
-        self.sideboard_card_list_model.setHorizontalHeaderLabels(["Sideboard"])
-        self.sideboard_card_list.setModel(self.sideboard_card_list_model)
-        self.sideboard_card_list.clicked.connect(self.update_picture)
-        self.sideboard_card_list.verticalHeader().hide()
-        self.sideboard_card_list.horizontalHeader().setStretchLastSection(True)
-        self.sideboard_card_list.horizontalHeader().setSectionsClickable(False)
-        self.sideboard_card_list.setShowGrid(False)
+        self.init_deck_list_properties(self.sideboard_card_list, self.sideboard_card_list_model, "Sideboard")
 
         self.consider_card_list_model = QtGui.QStandardItemModel()
-        self.consider_card_list_model.setHorizontalHeaderLabels(["Considering"])
-        self.consider_card_list.setModel(self.consider_card_list_model)
-        self.consider_card_list.clicked.connect(self.update_picture)
-        self.consider_card_list.verticalHeader().hide()
-        self.consider_card_list.horizontalHeader().setStretchLastSection(True)
-        self.consider_card_list.horizontalHeader().setSectionsClickable(False)
-        self.consider_card_list.setShowGrid(False)
+        self.init_deck_list_properties(self.consider_card_list, self.consider_card_list_model, "Considering")
 
         self.deck_history_model = QtGui.QStandardItemModel()
         self.deck_history.setModel(self.deck_history_model)
@@ -79,22 +53,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.right_card_list_layout.insertWidget(0, self.sideboard_card_list)
 
         self.commander_cards.hide()
-
         self.mainboard_card_list.hide()
         self.sideboard_card_list.hide()
         self.consider_card_list.hide()
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setVerticalStretch(1)
-        sizePolicy.setHorizontalStretch(1)
-
-        self.mainboard_card_list.setSizePolicy(sizePolicy)
-        self.sideboard_card_list.setSizePolicy(sizePolicy)
-        self.consider_card_list.setSizePolicy(sizePolicy)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        size_policy.setVerticalStretch(1)
+        size_policy.setHorizontalStretch(1)
+        self.mainboard_card_list.setSizePolicy(size_policy)
+        self.sideboard_card_list.setSizePolicy(size_policy)
+        self.consider_card_list.setSizePolicy(size_policy)
 
         self.save_snapshot_btn.clicked.connect(self.save_snapshot)
         self.new_version_btn.clicked.connect(self.add_version)
         self.restore_btn.clicked.connect(self.restore_version)
+
+    def init_deck_list_properties(self, list_, model, title):
+        model.setHorizontalHeaderLabels([title])
+        list_.setModel(model)
+        list_.clicked.connect(self.update_picture)
+        list_.verticalHeader().hide()
+        list_.horizontalHeader().setStretchLastSection(True)
+        list_.horizontalHeader().setSectionsClickable(False)
+        list_.setShowGrid(False)
 
     def setup_list_widgets(self, deck):
         self.commander_cards.setVisible(bool(deck.commanders))

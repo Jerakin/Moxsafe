@@ -229,6 +229,8 @@ class MainWindow(QtWidgets.QMainWindow):
 def main():
     sys.excepthook = exception.ui_exception
     app = QtWidgets.QApplication(sys.argv)
+    with (Path(__file__).parent.parent / "res" / "style.qss").open() as fh:
+        app.setStyleSheet(fh.read())
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())

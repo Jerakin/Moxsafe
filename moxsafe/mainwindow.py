@@ -176,11 +176,11 @@ class MainWindow(QtWidgets.QMainWindow):
         image = QtGui.QImage(image_path.as_posix())
         pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_image = QtGui.QPixmap(pixmap)
-
-        self.card_image.setPixmap(pixmap_image)
-        self.card_image.setMaximumSize(250, int(250*(pixmap_image.height()/pixmap_image.width())))
-        self.card_image.setScaledContents(True)
-        self.card_image.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        if pixmap_image and pixmap_image.width():
+            self.card_image.setPixmap(pixmap_image)
+            self.card_image.setMaximumSize(250, int(250*(pixmap_image.height()/pixmap_image.width())))
+            self.card_image.setScaledContents(True)
+            self.card_image.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
     def _save_snapshot(self, comment):
         deck_name = self.deckSwitch.currentText()

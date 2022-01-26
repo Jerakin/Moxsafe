@@ -87,7 +87,7 @@ class Moxsafe:
 
         with deck_file.open("w") as fp:
             fp.write(deck.list)
-        _git('add', deck_file)
+        _git('add', deck_file.as_posix())
         _git('commit', "-m", f"{deck.name} by {deck.author}")
 
         # Add to index
@@ -99,7 +99,7 @@ class Moxsafe:
         with self._index_file.open("w") as fp:
             json.dump(self._index, fp)
 
-        _git('add', self._index_file)
+        _git('add', self._index_file.as_posix())
         _git('commit', "-m", f"Updated index with {deck.name}")
 
     @property
@@ -113,7 +113,7 @@ class Moxsafe:
         deck_file = repository_path / f"{deck.id}.txt"
         with deck_file.open("w") as fp:
             fp.write(deck.list)
-        _git('add', deck_file)
+        _git('add', deck_file.as_posix())
         _git('commit', "-m", f"{deck.name} by {deck.author}")
 
     def add_snapshot(self, deck: moxfield.Deck, comment, active_version="main"):
@@ -125,7 +125,7 @@ class Moxsafe:
         _git('checkout', f"{deck.id}/{active_version}")
         with deck_file.open("w") as fp:
             fp.write(deck.list)
-        _git('add', deck_file)
+        _git('add', deck_file.as_posix())
         _git('commit', "-m", comment if comment else "Update")
         _git('checkout', "main")
 
@@ -153,7 +153,7 @@ class Moxsafe:
                 break
         with self._index_file.open("w") as fp:
             json.dump(self._index, fp)
-        _git('add', self._index_file)
+        _git('add', self._index_file.as_posix())
         _git('commit', "-m", f"Removed {deck.name}")
 
     def update_index(self, deck, index_entry):
@@ -166,7 +166,7 @@ class Moxsafe:
                 deck_entry["name"] = index_entry["name"] if index_entry["name"] else deck_entry["name"]
                 with self._index_file.open("w") as fp:
                     json.dump(self._index, fp)
-                _git('add', self._index_file)
+                _git('add', self._index_file.as_posix())
                 _git('commit', "-m", f"Updated index for {deck.name}")
                 break
 
